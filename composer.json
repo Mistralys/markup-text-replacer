@@ -1,0 +1,33 @@
+{
+  "name": "mistralys/markup-text-replacer",
+  "description": "Tool to search and replace texts in an HTML or XML document with context awareness to keep the markup functional.",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sebastian Mordziol",
+      "email": "s.mordziol@mistralys.eu"
+    }
+  ],
+  "autoload": {
+    "classmap": [
+      "src"
+    ]
+  },
+  "autoload-dev": {
+    "classmap": [
+      "tests/TestClasses"
+      ]
+  },
+  "require": {
+    "mistralys/application-utils": ">=2.2.7",
+    "php": ">=7.4",
+    "ext-dom": "*"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest",
+    "phpstan/phpstan": ">=1.9.2",
+    "phpunit/phpunit": ">=9.5.26"
+  }
+}
