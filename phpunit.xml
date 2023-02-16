@@ -12,5 +12,8 @@
         <testsuite name="Filtering">
             <directory suffix=".php">./tests/TestSuites/Filtering</directory>
         </testsuite>
+        <testsuite name="Parser">
+            <directory suffix=".php">./tests/TestSuites/Parser</directory>
+        </testsuite>
     </testsuites>
 </phpunit>
