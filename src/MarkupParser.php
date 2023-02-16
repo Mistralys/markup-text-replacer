@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Mistralys\MarkupTextReplacer;
 
-use AppUtils\ConvertHelper;
 use DOMAttr;
 use DOMDocument;
 use DOMElement;
