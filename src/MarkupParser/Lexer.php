@@ -5,10 +5,28 @@ declare(strict_types=1);
 namespace Mistralys\MarkupTextReplacer\MarkupParser;
 
 use AppUtils\ConvertHelper;
+use ArrayAccess;
 use Mistralys\MarkupTextReplacer\Interfaces\LoggerInterface;
 use Mistralys\MarkupTextReplacer\Interfaces\LoggerTrait;
 
-class Lexer implements LoggerInterface
+/**
+ * The lexer splits the HTML source into individual
+ * characters, and analyses them to detect HTML elements
+ * like tags and comments. This allows very fine-grained
+ * control.
+ *
+ * No structural checks are made at this point: It is
+ * only a list of characters as they appear in the
+ * document. The next step is the
+ * {@see \Mistralys\MarkupTextReplacer\MarkupParser\Tokenizer}.
+ *
+ * @package MarkupTextReplacer
+ * @subpackage Parser
+ * @author Sebastian Mordziol <s.mordziol@mistralys.eu>
+ *
+ * @implements ArrayAccess<int,array{type:string,char:string}|array{type:string,char:string,tagName:string}>
+ */
+class Lexer implements LoggerInterface, ArrayAccess
 {
     use LoggerTrait;
 
@@ -19,6 +37,7 @@ class Lexer implements LoggerInterface
     public const CHAR_OPEN_CLOSING_TAG = 'open-closing-tag';
     public const CHAR_OPEN_OPENING_TAG = 'open-opening-tag';
     public const CHAR_CLOSE_TAG = 'close-tag';
+    public const CHAR_OPEN_COMMENT = 'open-comment';
 
     /**
      * @var string[]
@@ -33,12 +52,9 @@ class Lexer implements LoggerInterface
         $this->parse();
     }
 
-    /**
-     * @return array<int,array{type:string,char:string}|array{type:string,char:string,tagName:string}>
-     */
-    public function getLexedChars() : array
+    public function createTokenizer() : Tokenizer
     {
-        return $this->lexedChars;
+        return new Tokenizer($this);
     }
 
     private function parse() : void
@@ -140,7 +156,7 @@ class Lexer implements LoggerInterface
                 {
                     $this->logTrivial('%s OpenBracket | Found an opening comment.', $logPrefix);
 
-                    $this->addLexedType('open-comment', $char);
+                    $this->addLexedType(self::CHAR_OPEN_COMMENT, $char);
                     $inComment = true;
                     continue;
                 }
@@ -395,5 +411,33 @@ class Lexer implements LoggerInterface
             $this->logDebug('LookAhead | Position [%s] | Is no match > BREAK', $seek);
             return -1;
         }
+    }
+
+    // region: Array access interface
+
+    public function offsetExists($offset) : bool
+    {
+        return isset($this->lexedChars[(int)$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->lexedChars[(int)$offset] ?? null;
+    }
+
+    public function offsetSet($offset, $value) : void
+    {
+        // we're not allowing changes.
+    }
+
+    public function offsetUnset($offset) : void
+    {
+        // we're not allowing changes.
+    }
+
+    // endregion
+    public function getChars() : array
+    {
+        return $this->lexedChars;
     }
 }
