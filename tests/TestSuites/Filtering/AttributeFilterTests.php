@@ -50,9 +50,4 @@ EOT;
                 ->filter($html))
         );
     }
-
-    private function stripWhitespace(string $subject) : string
-    {
-        return str_replace(array("\n", "\r"), '', $subject);
-    }
 }
