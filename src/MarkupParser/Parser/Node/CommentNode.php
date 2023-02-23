@@ -8,8 +8,16 @@ use Mistralys\MarkupTextReplacer\MarkupParser\Parser\BaseNode;
 
 class CommentNode extends BaseNode
 {
+    private string $text;
+
     public function __construct(string $text)
     {
+        $this->text = $text;
+    }
+
+    public function render() : string
+    {
+        return $this->text;
     }
 
     public function getNodeType() : string

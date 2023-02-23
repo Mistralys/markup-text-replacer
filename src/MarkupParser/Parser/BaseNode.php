@@ -20,6 +20,7 @@ abstract class BaseNode implements LoggerInterface
     public const NODE_TYPE_DOCUMENT_ROOT = 'document-root';
 
     abstract public function getNodeType() : string;
+    abstract public function render() : string;
 
     public function getNodeInfo() : array
     {

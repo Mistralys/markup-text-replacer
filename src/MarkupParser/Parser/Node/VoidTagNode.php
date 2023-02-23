@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Mistralys\MarkupTextReplacer\MarkupParser\Parser\Node;
 
+use Mistralys\MarkupTextReplacer\MarkupParser\AttributeParser;
 use Mistralys\MarkupTextReplacer\MarkupParser\Parser\BaseNode;
 
 class VoidTagNode extends BaseNode
 {
     private string $tagName;
+    private AttributeParser $attributes;
 
     public function __construct(string $tagName, string $tagMarkup)
     {
         $this->tagName = $tagName;
-        $this->tagMarkup = $tagMarkup;
+        $this->attributes = new AttributeParser($tagMarkup);
     }
 
     public function getTagName() : string
@@ -32,5 +34,10 @@ class VoidTagNode extends BaseNode
         $info['tagName'] = $this->getTagName();
 
         return $info;
+    }
+
+    public function render() : string
+    {
+        return $this->attributes->render();
     }
 }

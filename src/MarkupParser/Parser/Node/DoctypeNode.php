@@ -8,8 +8,16 @@ use Mistralys\MarkupTextReplacer\MarkupParser\Parser\BaseNode;
 
 class DoctypeNode extends BaseNode
 {
-    public function __construct(string $tag)
+    private string $markup;
+
+    public function __construct(string $markup)
     {
+        $this->markup = $markup;
+    }
+
+    public function render() : string
+    {
+        return $this->markup;
     }
 
     public function getNodeType() : string

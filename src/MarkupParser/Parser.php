@@ -12,6 +12,7 @@ use Mistralys\MarkupTextReplacer\MarkupParser\Parser\Node\TagNode;
 use Mistralys\MarkupTextReplacer\MarkupParser\Parser\Node\TextNode;
 use Mistralys\MarkupTextReplacer\MarkupParser\Parser\Node\VoidTagNode;
 use Mistralys\MarkupTextReplacer\MarkupParser\Parser\Node\WhitespaceNode;
+use SebastianBergmann\CodeCoverage\ParserException;
 
 class Parser extends BaseTreeNode
 {
@@ -46,14 +47,26 @@ class Parser extends BaseTreeNode
      */
     private array $tagStack = array();
     private Tokenizer $tokenizer;
+    private bool $parsed = false;
 
-    public function __construct(Tokenizer $tokenizer)
+    private function __construct(Tokenizer $tokenizer)
     {
         $this->tokenizer = $tokenizer;
     }
 
+    public static function create(string $html) : Parser
+    {
+        return new Parser((new Lexer($html))->createTokenizer());
+    }
+
     public function parse() : self
     {
+        if($this->parsed === true) {
+            return $this;
+        }
+
+        $this->parsed = true;
+
         $tokens = $this->tokenizer->getTokens();
 
         $this->logTrivial('Parsing [%s] tokens.', count($tokens));
@@ -81,11 +94,11 @@ class Parser extends BaseTreeNode
 
         if($this->openTag !== null)
         {
-            $this->openTag->appendChildNode($node);
+            $this->openTag->appendNode($node);
         }
         else
         {
-            $this->appendChildNode($node);
+            $this->appendNode($node);
         }
     }
 
@@ -129,11 +142,11 @@ class Parser extends BaseTreeNode
 
             if(isset($this->openTag))
             {
-                $this->openTag->appendChildNode($node);
+                $this->openTag->appendNode($node);
             }
             else
             {
-                $this->appendChildNode($node);
+                $this->appendNode($node);
             }
 
             $this->openTag = $node;
@@ -157,7 +170,7 @@ class Parser extends BaseTreeNode
             if($tagName === $node->getTagName())
             {
                 $this->logTrivial('Closed the [%s] tag.', $tagName);
-                $node->setClosingMarkup($content);
+                $node->registerClosingMarkup($content);
             }
             else
             {
@@ -188,5 +201,15 @@ class Parser extends BaseTreeNode
     public function getNodeType() : string
     {
         return self::NODE_TYPE_DOCUMENT_ROOT;
+    }
+
+    protected function renderOpeningMarkup() : string
+    {
+        return '';
+    }
+
+    protected function renderClosingMarkup() : string
+    {
+        return '';
     }
 }
