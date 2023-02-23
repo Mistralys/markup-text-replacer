@@ -4,15 +4,29 @@ declare(strict_types=1);
 
 namespace Mistralys\MarkupTextReplacerTests\TestSuites\Parser;
 
-use Mistralys\MarkupTextReplacer\MarkupParser\Lexer;
 use Mistralys\MarkupTextReplacer\MarkupParser\Parser;
 use Mistralys\MarkupTextReplacerTests\TestClasses\TextReplacerTestCase;
 
 final class ParserTests extends TextReplacerTestCase
 {
-    public function test_tree() : void
+    public function test_parse() : void
     {
-        $html = <<<'EOT'
+        $parser = $this->createTestParser()->parse();
+
+        //print_r($parser->renderNodeTree());
+
+        $this->assertSame(3, $parser->countChildNodes(), 'Doctype, Newline, HTML taq');
+        $this->assertSame(2, $parser->countChildNodes(false), 'Doctype, HTML tag');
+    }
+
+    public function test_restoreOriginalHTMLUnchanged() : void
+    {
+        $parser = $this->createTestParser()->parse();
+
+        $this->assertSame($parser->render(), $this->testHTML);
+    }
+
+    private string $testHTML = <<<'EOT'
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -29,15 +43,8 @@ final class ParserTests extends TextReplacerTestCase
 </html>
 EOT;
 
-        $parser = (new Parser(
-            (new Lexer($html))
-            ->createTokenizer()
-        ))
-            ->setAllLoggingEnabled()
-        ->parse();
-
-        $result = array();
-        $parser->renderNodeTree($result);
-        print_r($result);
+    private function createTestParser() : Parser
+    {
+        return Parser::create($this->testHTML);
     }
 }
